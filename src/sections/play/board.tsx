@@ -10,7 +10,6 @@ import {
 import { useChessActions } from "@/hooks/useChessActions";
 import { useEffect, useMemo } from "react";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import { Color } from "@/types/enums";
 import { useEngine } from "@/hooks/useEngine";
 import { uciMoveParams } from "@/lib/chess";
 import Board from "@/components/board";
@@ -72,16 +71,6 @@ export default function BoardContainer() {
       canPlay={isGameInProgress ? playerColor : false}
       gameAtom={gameAtom}
       boardSize={boardSize}
-      whitePlayer={
-        playerColor === Color.White
-          ? "You 🧠"
-          : `Stockfish level ${engineSkillLevel} 🤖`
-      }
-      blackPlayer={
-        playerColor === Color.Black
-          ? "You 🧠"
-          : `Stockfish level ${engineSkillLevel} 🤖`
-      }
       boardOrientation={playerColor}
       currentPositionAtom={gameDataAtom}
     />

@@ -1,4 +1,4 @@
-import { Grid2 as Grid, Typography } from "@mui/material";
+import { Grid2 as Grid } from "@mui/material";
 import { Chessboard } from "react-chessboard";
 import { PrimitiveAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import {
@@ -14,16 +14,14 @@ import { Chess } from "chess.js";
 import { getSquareRenderer } from "./squareRenderer";
 import { CurrentPosition } from "@/types/eval";
 import EvaluationBar from "./evaluationBar";
-import CapturedPieces from "./capturedPieces";
 import { moveClassificationColors } from "@/lib/chess";
+import { Player } from "./player";
 
 export interface Props {
   id: string;
   canPlay?: Color | boolean;
   gameAtom: PrimitiveAtom<Chess>;
   boardSize?: number;
-  whitePlayer?: string;
-  blackPlayer?: string;
   boardOrientation?: Color;
   currentPositionAtom?: PrimitiveAtom<CurrentPosition>;
   showBestMoveArrow?: boolean;
@@ -36,8 +34,6 @@ export default function Board({
   canPlay,
   gameAtom,
   boardSize,
-  whitePlayer,
-  blackPlayer,
   boardOrientation = Color.White,
   currentPositionAtom = atom({}),
   showBestMoveArrow = false,
@@ -242,22 +238,10 @@ export default function Board({
         paddingLeft={showEvaluationBar ? 2 : 0}
         size="grow"
       >
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          columnGap={2}
-          size={12}
-        >
-          <Typography>
-            {boardOrientation === Color.White ? blackPlayer : whitePlayer}
-          </Typography>
-
-          <CapturedPieces
-            gameAtom={gameAtom}
-            color={boardOrientation === Color.White ? Color.Black : Color.White}
-          />
-        </Grid>
+        <Player
+          gameAtom={gameAtom}
+          color={boardOrientation === Color.White ? Color.Black : Color.White}
+        />
 
         <Grid
           container
@@ -291,19 +275,7 @@ export default function Board({
           />
         </Grid>
 
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          columnGap={2}
-          size={12}
-        >
-          <Typography>
-            {boardOrientation === Color.White ? whitePlayer : blackPlayer}
-          </Typography>
-
-          <CapturedPieces gameAtom={gameAtom} color={boardOrientation} />
-        </Grid>
+        <Player gameAtom={gameAtom} color={boardOrientation} />
       </Grid>
     </Grid>
   );
