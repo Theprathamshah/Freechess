@@ -28,14 +28,14 @@ export const Player = ({ gameAtom, color }: Props) => {
     const comment = game.getComment();
     if (!comment) return undefined;
 
-    const test = comment.match(/\[%clk (\d+):(\d+):(\d+)(?:\.(\d*))?\]/);
-    if (!test) return undefined;
+    const match = comment.match(/\[%clk (\d+):(\d+):(\d+)(?:\.(\d*))?\]/);
+    if (!match) return undefined;
 
     return {
-      hours: parseInt(test[1]),
-      minutes: parseInt(test[2]),
-      seconds: parseInt(test[3]),
-      tenths: test[4] ? parseInt(test[4]) : 0,
+      hours: parseInt(match[1]),
+      minutes: parseInt(match[2]),
+      seconds: parseInt(match[3]),
+      tenths: match[4] ? parseInt(match[4]) : 0,
     };
   }, [game]);
   console.log(clock);
