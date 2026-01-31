@@ -31,7 +31,7 @@ import { useChessActions } from "@/hooks/useChessActions";
 import { logAnalyticsEvent } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import { isEngineSupported } from "@/lib/engine/shared";
-import { Stockfish16_1 } from "@/lib/engine/stockfish16_1";
+import { Stockfish17 } from "@/lib/engine/stockfish17";
 import { DEFAULT_ENGINE, ENGINE_LABELS, STRONGEST_ENGINE } from "@/constants";
 import { getGameFromPgn } from "@/lib/chess";
 
@@ -103,8 +103,8 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
 
   useEffect(() => {
     if (!isEngineSupported(engineName)) {
-      if (Stockfish16_1.isSupported()) {
-        setEngineName(EngineName.Stockfish16_1Lite);
+      if (Stockfish17.isSupported()) {
+        setEngineName(EngineName.Stockfish17Lite);
       } else {
         setEngineName(EngineName.Stockfish11);
       }
