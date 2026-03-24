@@ -1,9 +1,11 @@
 import { Button, Skeleton, Stack, Typography } from "@mui/material";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import StopIcon from "@mui/icons-material/Stop";
-import { useAtomValue } from "jotai";
-import { boardAtom, currentPositionAtom } from "../../states";
-import { useMemo } from "react";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { useAtom, useAtomValue } from "jotai";
+import { boardAtom, currentPositionAtom, isExplanationMutedAtom } from "../../states";
+import { useEffect, useMemo, useRef } from "react";
 import { moveLineUciToSan } from "@/lib/chess";
 import { MoveClassification } from "@/types/enums";
 import Image from "next/image";
@@ -17,6 +19,28 @@ export default function MoveInfo() {
   const bestMove = position?.lastEval?.bestMove;
   const explanationText = position.eval?.explanation || "";
   const { speak, stop, isPlaying, isSupported } = useTTS(explanationText);
+
+  const [isMuted, setIsMuted] = useAtom(isExplanationMutedAtom);
+  const lastPlayedPositionRef = useRef<typeof position | null>(null);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+    // Explanation text exists, auto-play enabled (not muted), audio is supported, and position has changed
+    if (
+      !isMuted &&
+      isSupported &&
+      explanationText &&
+      lastPlayedPositionRef.current !== position
+    ) {
+      lastPlayedPositionRef.current = position;
+      timer = setTimeout(() => {
+        speak();
+      }, 50);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [position, explanationText, isMuted, isSupported, speak]);
 
   const bestMoveSan = useMemo(() => {
     if (!bestMove) return undefined;
@@ -126,16 +150,28 @@ export default function MoveInfo() {
       </Typography>
 
       {isSupported && explanationText && (
-        <Button
-          size="small"
-          onClick={isPlaying ? stop : speak}
-          startIcon={isPlaying ? <StopIcon /> : <VolumeUpIcon />}
-          sx={{ mt: 1, textTransform: "none", alignSelf: "center", borderRadius: "16px" }}
-          variant="outlined"
-          color="inherit"
-        >
-          {isPlaying ? "Stop Listening" : "Listen Explanation"}
-        </Button>
+        <Stack direction="row" spacing={1} mt={1} alignSelf="center" alignItems="center">
+          <Button
+            size="small"
+            onClick={() => setIsMuted((prev) => !prev)}
+            startIcon={isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+            sx={{ textTransform: "none", borderRadius: "16px" }}
+            variant="outlined"
+            color="inherit"
+          >
+            {isMuted ? "Unmute" : "Mute"}
+          </Button>
+          <Button
+            size="small"
+            onClick={isPlaying ? stop : speak}
+            startIcon={isPlaying ? <StopIcon /> : <PlayArrowIcon />}
+            sx={{ textTransform: "none", borderRadius: "16px" }}
+            variant="outlined"
+            color="inherit"
+          >
+            {isPlaying ? "Stop" : "Play"}
+          </Button>
+        </Stack>
       )}
     </Stack>
   );
