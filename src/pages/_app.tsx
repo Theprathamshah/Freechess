@@ -5,6 +5,7 @@ import "@fontsource/roboto/700.css";
 import { AppProps } from "next/app";
 import Layout from "@/sections/layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <QueryClientProvider client={queryClient}>
       <Layout>
         <Component {...pageProps} />
+        <Analytics />
       </Layout>
     </QueryClientProvider>
   );
