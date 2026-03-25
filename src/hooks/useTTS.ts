@@ -7,6 +7,42 @@ interface UseTTSResult {
   stop: () => void;
 }
 
+const preprocessChessTextForTTS = (text: string): string => {
+  if (!text) return text;
+  
+  let processed = text;
+  
+  // Handle castling first
+  processed = processed.replace(/\bO-O-O\b/g, "castles queen side");
+  processed = processed.replace(/\bO-O\b/g, "castles king side");
+  
+  const pieceNames: Record<string, string> = {
+    K: "King ",
+    Q: "Queen ",
+    R: "Rook ",
+    B: "Bishop ",
+    N: "Knight "
+  };
+  
+  // Match standard chess notation (e.g., Nxd4, exd5, a8=Q+, Rae1#)
+  const sanRegex = /\b([KQRBN]?)([a-h]?[1-8]?)(x?)([a-h][1-8])(?:=([QRBN]))?([\+#]?)(?!\w)/g;
+  
+  processed = processed.replace(sanRegex, (_, piece, disambiguation, capture, dest, promotion, check) => {
+    let res = "";
+    if (piece) res += pieceNames[piece];
+    if (disambiguation) res += disambiguation + " ";
+    if (capture) res += "takes ";
+    res += dest;
+    if (promotion) res += " equals " + pieceNames[promotion].trim();
+    if (check === "+") res += " check";
+    if (check === "#") res += " checkmate";
+    
+    return res.trim(); // Trim extra spaces just in case
+  });
+  
+  return processed.replace(/\s+/g, " ").trim();
+};
+
 export const useTTS = (text: string | undefined): UseTTSResult => {
   const [isSupported, setIsSupported] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -39,7 +75,8 @@ export const useTTS = (text: string | undefined): UseTTSResult => {
 
     stop();
 
-    const speech = new SpeechSynthesisUtterance(text);
+    const processedText = preprocessChessTextForTTS(text);
+    const speech = new SpeechSynthesisUtterance(processedText);
     speech.lang = "en-US";
     speech.rate = 0.95;
     speech.pitch = 1.05;
