@@ -13,10 +13,10 @@ interface Props {
 
 const nivoTheme = {
   background: "transparent",
-  text: { fill: "#aaa", fontSize: 11 },
-  axis: { ticks: { text: { fill: "#777" } } },
-  grid: { line: { stroke: "#2a2a2a" } },
-  tooltip: { container: { background: "#1a1a2e", border: "1px solid #333", color: "#fff" } },
+  text: { fill: "#8a8a96", fontSize: 11 },
+  axis: { ticks: { text: { fill: "#666" } } },
+  grid: { line: { stroke: "#222226" } },
+  tooltip: { container: { background: "#1a1a1e", border: "1px solid rgba(201,162,39,0.2)", color: "#e8e8ea" } },
 };
 
 function NeedsAnalysisBadge({ count, onAnalyze }: { count: number; onAnalyze?: () => void }) {
@@ -70,7 +70,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
   return (
     <Box>
       {/* Move Quality Distribution */}
-      <Paper sx={{ p: 3, borderRadius: 3, mb: 3, background: "rgba(255,255,255,0.03)" }}>
+      <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
         <Typography variant="h6" fontWeight={700} mb={0.5}>Move Quality Distribution</Typography>
         <Typography variant="body2" color="text.secondary" mb={2}>
           How you play across all analyzed games
@@ -109,7 +109,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
       <Grid container spacing={2.5} mb={3}>
         {/* Phase Accuracy Radar */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)", height: "100%" }}>
+          <Paper sx={{ p: 3, borderRadius: 3, height: "100%" }}>
             <Typography variant="h6" fontWeight={700} mb={0.5}>Accuracy by Game Phase</Typography>
             <Typography variant="body2" color="text.secondary" mb={1}>
               Where do you play best?
@@ -127,7 +127,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
                     valueFormat={v => `${v}%`}
                     margin={{ top: 30, right: 60, bottom: 30, left: 60 }}
                     theme={nivoTheme}
-                    colors={["#1976d2"]}
+                    colors={["#c9a227"]}
                     fillOpacity={0.25}
                     borderColor={{ from: "color" }}
                     gridLevels={4}
@@ -156,7 +156,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
 
         {/* Castling Stats */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)", height: "100%" }}>
+          <Paper sx={{ p: 3, borderRadius: 3, height: "100%" }}>
             <Typography variant="h6" fontWeight={700} mb={0.5}>Castling Impact</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
               Win rate when you castle vs don&apos;t
@@ -168,7 +168,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
                     data={castlingData}
                     keys={["Win Rate"]}
                     indexBy="scenario"
-                    colors={["#1976d2"]}
+                    colors={["#c9a227"]}
                     theme={nivoTheme}
                     margin={{ top: 10, right: 20, bottom: 40, left: 50 }}
                     padding={0.5}
@@ -199,7 +199,7 @@ export function MovesTab({ stats, onAnalyze, unanalyzedCount = 0 }: Props) {
 
       {/* Move Quality Bar Chart (only when analyzed) */}
       {hasAnalyzedGames && moveQualityData.length > 0 && (
-        <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)" }}>
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
           <Typography variant="h6" fontWeight={700} mb={2}>Move Quality by Count</Typography>
           <Box sx={{ height: 220 }}>
             <ResponsiveBar

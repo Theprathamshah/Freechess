@@ -10,14 +10,14 @@ interface Props {
 
 const nivoTheme = {
   background: "transparent",
-  text: { fill: "#aaa", fontSize: 12 },
+  text: { fill: "#8a8a96", fontSize: 12 },
   axis: {
-    ticks: { text: { fill: "#888" } },
-    legend: { text: { fill: "#888" } },
+    ticks: { text: { fill: "#666" } },
+    legend: { text: { fill: "#666" } },
   },
-  grid: { line: { stroke: "#333" } },
-  tooltip: { container: { background: "#1a1a2e", border: "1px solid #333", color: "#fff" } },
-  legends: { text: { fill: "#aaa" } },
+  grid: { line: { stroke: "#222226" } },
+  tooltip: { container: { background: "#1a1a1e", border: "1px solid rgba(201,162,39,0.2)", color: "#e8e8ea" } },
+  legends: { text: { fill: "#8a8a96" } },
 };
 
 function ColorBlock({
@@ -94,12 +94,12 @@ export function OverviewTab({ stats }: Props) {
   const lineData = [
     {
       id: "White",
-      color: "#e0e0e0",
+      color: "#c9a227",
       data: stats.accuracyOverTime.map(d => ({ x: d.gameIndex, y: +d.white.toFixed(1) })),
     },
     {
       id: "Black",
-      color: "#78909c",
+      color: "#4a9eff",
       data: stats.accuracyOverTime.map(d => ({ x: d.gameIndex, y: +d.black.toFixed(1) })),
     },
   ];
@@ -119,10 +119,10 @@ export function OverviewTab({ stats }: Props) {
       {/* Top stat cards */}
       <Grid container spacing={2.5} mb={3}>
         {[
-          { value: `${stats.avgAccuracy.toFixed(1)}%`, label: "Overall Accuracy", color: "primary.main", bg: "rgba(25,118,210,0.08)" },
+          { value: `${stats.avgAccuracy.toFixed(1)}%`, label: "Overall Accuracy", color: "#c9a227", bg: "rgba(201,162,39,0.08)" },
           { value: `${overallWinRate}%`, label: "Overall Win Rate", color: "success.main", bg: "rgba(76,175,80,0.08)" },
-          { value: stats.totalGames, label: "Total Games", color: "secondary.main", bg: "rgba(156,39,176,0.08)" },
-          { value: stats.analyzedGames, label: "Analyzed", color: "#FFA726", bg: "rgba(255,152,0,0.08)" },
+          { value: stats.totalGames, label: "Total Games", color: "secondary.main", bg: "rgba(74,158,255,0.08)" },
+          { value: stats.analyzedGames, label: "Analyzed", color: "#e8b830", bg: "rgba(201,162,39,0.05)" },
         ].map(c => (
           <Grid key={c.label} size={{ xs: 6, md: 3 }}>
             <Paper sx={{ p: 2.5, borderRadius: 3, background: c.bg, textAlign: "center", height: "100%" }}>
@@ -145,7 +145,7 @@ export function OverviewTab({ stats }: Props) {
 
       {/* Accuracy over time */}
       {stats.accuracyOverTime.length > 1 && (
-        <Paper sx={{ p: 3, borderRadius: 3, mb: 3, background: "rgba(255,255,255,0.03)" }}>
+        <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
           <Typography variant="h6" fontWeight={700} mb={2}>Accuracy Over Time</Typography>
           <Box sx={{ height: 260 }}>
             <ResponsiveLine
@@ -176,7 +176,7 @@ export function OverviewTab({ stats }: Props) {
 
       {/* Termination types */}
       {terminationData.length > 1 && (
-        <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)" }}>
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
           <Typography variant="h6" fontWeight={700} mb={2}>How Games End</Typography>
           <Grid container spacing={2} alignItems="center">
             <Grid size={{ xs: 12, sm: 5 }}>

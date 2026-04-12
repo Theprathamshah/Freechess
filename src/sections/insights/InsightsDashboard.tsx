@@ -26,6 +26,9 @@ import { CalendarTab } from "./CalendarTab";
 
 type InsightsTab = "overview" | "openings" | "moves" | "calendar";
 
+// Shared amber palette token
+const GOLD = "#c9a227";
+
 export function InsightsDashboard() {
   const [storedUsername, setStoredUsername] = useInsightsUsername();
   const username = storedUsername ?? "";
@@ -58,25 +61,34 @@ export function InsightsDashboard() {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #0a0a0f 0%, #0f0f1e 50%, #0a0f0a 100%)",
+        bgcolor: "background.default",
       }}
     >
-      {/* ─── Header ─────────────────────────────────────────────────────────── */}
-      <Box sx={{
-        background: "linear-gradient(180deg, rgba(25,118,210,0.12) 0%, transparent 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.07)",
-        px: { xs: 2, md: 4 },
-        py: 3,
-      }}>
+      {/* ─── Header ──────────────────────────────────────────────────────────── */}
+      <Box
+        sx={{
+          background: `linear-gradient(180deg, rgba(201,162,39,0.08) 0%, transparent 100%)`,
+          borderBottom: `1px solid rgba(201,162,39,0.15)`,
+          px: { xs: 2, md: 4 },
+          py: 3,
+        }}
+      >
         <Box sx={{ maxWidth: 1280, mx: "auto" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3, flexWrap: "wrap" }}>
-            <Box sx={{
-              p: 1.2, borderRadius: 2,
-              background: "linear-gradient(135deg, #1976d2, #42a5f5)",
-              display: "flex", alignItems: "center",
-            }}>
-              <Icon icon="mdi:chart-areaspline" height={28} color="#fff" />
+            {/* Icon badge */}
+            <Box
+              sx={{
+                p: 1.2,
+                borderRadius: 2,
+                background: `linear-gradient(135deg, ${GOLD}, #e8b830)`,
+                display: "flex",
+                alignItems: "center",
+                boxShadow: `0 0 16px rgba(201,162,39,0.35)`,
+              }}
+            >
+              <Icon icon="mdi:chart-areaspline" height={28} color="#0d0d0f" />
             </Box>
+
             <Box sx={{ flex: 1 }}>
               <Typography variant="h4" fontWeight={800} letterSpacing="-0.5px">
                 Chess Insights
@@ -109,9 +121,10 @@ export function InsightsDashboard() {
                   size="small"
                   onClick={startBatchAnalysis}
                   disabled={isAnalyzing || !isReady}
-                  startIcon={isAnalyzing
-                    ? <CircularProgress size={14} color="inherit" />
-                    : <Icon icon="mdi:brain" height={16} />
+                  startIcon={
+                    isAnalyzing
+                      ? <CircularProgress size={14} color="inherit" />
+                      : <Icon icon="mdi:brain" height={16} />
                   }
                   sx={{ borderRadius: 6, px: 2 }}
                 >
@@ -121,12 +134,15 @@ export function InsightsDashboard() {
             </Stack>
           </Box>
 
-          {/* ─── Username + Platform Row ──────────────────────────────────────── */}
-          <Paper sx={{
-            p: 2, borderRadius: 3,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.07)",
-          }}>
+          {/* ─── Username + Platform Row ───────────────────────────────────────── */}
+          <Paper
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              background: "rgba(255,255,255,0.03)",
+              border: `1px solid rgba(201,162,39,0.15)`,
+            }}
+          >
             <Grid container spacing={2} alignItems="center">
               {/* My username */}
               <Grid size={{ xs: 12, sm: 4, md: 3 }}>
@@ -135,10 +151,12 @@ export function InsightsDashboard() {
                   size="small"
                   fullWidth
                   value={username}
-                  onChange={e => setStoredUsername(e.target.value)}
+                  onChange={(e) => setStoredUsername(e.target.value)}
                   helperText="Used to assign White/Black stats"
                   InputProps={{
-                    startAdornment: <Icon icon="mdi:account-circle" height={20} style={{ marginRight: 8, opacity: 0.5 }} />,
+                    startAdornment: (
+                      <Icon icon="mdi:account-circle" height={20} style={{ marginRight: 8, opacity: 0.5 }} />
+                    ),
                   }}
                 />
               </Grid>
@@ -174,8 +192,8 @@ export function InsightsDashboard() {
                   size="small"
                   fullWidth
                   value={externalUsername}
-                  onChange={e => setExternalUsername(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleFetch()}
+                  onChange={(e) => setExternalUsername(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleFetch()}
                   placeholder={`Enter your ${platform} username`}
                 />
               </Grid>
@@ -185,9 +203,10 @@ export function InsightsDashboard() {
                   variant="outlined"
                   onClick={handleFetch}
                   disabled={isFetching || !externalUsername.trim()}
-                  startIcon={isFetching
-                    ? <CircularProgress size={16} color="inherit" />
-                    : <Icon icon="mdi:cloud-download-outline" height={18} />
+                  startIcon={
+                    isFetching
+                      ? <CircularProgress size={16} color="inherit" />
+                      : <Icon icon="mdi:cloud-download-outline" height={18} />
                   }
                   sx={{ borderRadius: 2, height: 40, whiteSpace: "nowrap" }}
                   fullWidth
@@ -204,47 +223,78 @@ export function InsightsDashboard() {
             )}
           </Paper>
 
-          {/* ─── Analysis Target Tabs ─────────────────────────────────────────── */}
+          {/* ─── Analysis Target Chips ─────────────────────────────────────────── */}
           <Box sx={{ mt: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {(["combined", "local", "external"] as AnalysisTarget[]).map(t => (
+            {(["combined", "local", "external"] as AnalysisTarget[]).map((t) => (
               <Chip
                 key={t}
-                label={t === "combined" ? "Unified Identity" : t === "local" ? "Saved Games" : "External Cloud"}
+                label={
+                  t === "combined" ? "Unified Identity" : t === "local" ? "Saved Games" : "External Cloud"
+                }
                 onClick={() => setAnalysisTarget(t)}
                 variant={analysisTarget === t ? "filled" : "outlined"}
                 color={analysisTarget === t ? "primary" : "default"}
-                icon={<Icon icon={
-                  t === "combined" ? "mdi:earth" :
-                  t === "local" ? "mdi:database" : "mdi:cloud"
-                } height={14} />}
+                icon={
+                  <Icon
+                    icon={
+                      t === "combined" ? "mdi:earth" : t === "local" ? "mdi:database" : "mdi:cloud"
+                    }
+                    height={14}
+                  />
+                }
               />
             ))}
           </Box>
         </Box>
       </Box>
 
-      {/* ─── Analysis Progress Bar ────────────────────────────────────────────── */}
+      {/* ─── Analysis Progress Bar ──────────────────────────────────────────────── */}
       {isAnalyzing && (
         <LinearProgress
           variant="determinate"
           value={progress}
-          sx={{ height: 3 }}
+          sx={{
+            height: 3,
+            bgcolor: "rgba(201,162,39,0.12)",
+            "& .MuiLinearProgress-bar": { bgcolor: GOLD },
+          }}
         />
       )}
 
-      {/* ─── No Data State ────────────────────────────────────────────────────── */}
+      {/* ─── No Data State ──────────────────────────────────────────────────────── */}
       {!stats && (
-        <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 }, py: 10, textAlign: "center" }}>
-          <Icon icon="mdi:chart-areaspline" height={64} opacity={0.15} />
-          <Typography variant="h5" sx={{ mt: 2, mb: 1 }}>No Insights Yet</Typography>
+        <Box
+          sx={{
+            maxWidth: 1280,
+            mx: "auto",
+            px: { xs: 2, md: 4 },
+            py: 12,
+            textAlign: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "inline-flex",
+              p: 3,
+              borderRadius: "50%",
+              bgcolor: "rgba(201,162,39,0.06)",
+              mb: 3,
+            }}
+          >
+            <Icon icon="mdi:chart-areaspline" height={56} color={GOLD} opacity={0.4} />
+          </Box>
+          <Typography variant="h5" sx={{ mt: 0, mb: 1, fontWeight: 700 }}>
+            No Insights Yet
+          </Typography>
           <Typography color="text.secondary" maxWidth={440} mx="auto">
-            Fetch games from Lichess or Chess.com above, then click <strong>Analyze</strong> to run Stockfish.
+            Fetch games from Lichess or Chess.com above, then click{" "}
+            <strong style={{ color: GOLD }}>Analyze</strong> to run Stockfish.
             Results appear here as games are processed.
           </Typography>
         </Box>
       )}
 
-      {/* ─── Main Content ─────────────────────────────────────────────────────── */}
+      {/* ─── Main Content ───────────────────────────────────────────────────────── */}
       {stats && (
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, md: 4 }, py: 3 }}>
           {/* Section Tabs */}
@@ -254,21 +304,52 @@ export function InsightsDashboard() {
             sx={{
               mb: 3,
               "& .MuiTabs-indicator": {
-                background: "linear-gradient(90deg, #1976d2, #42a5f5)",
+                background: `linear-gradient(90deg, ${GOLD}, #e8b830)`,
                 height: 3,
                 borderRadius: 2,
               },
+              "& .MuiTab-root": {
+                color: "text.secondary",
+                "&.Mui-selected": { color: GOLD },
+              },
             }}
           >
-            <Tab value="overview" label="Overview" icon={<Icon icon="mdi:view-dashboard" height={18} />} iconPosition="start" />
-            <Tab value="openings" label="Openings" icon={<Icon icon="mdi:book-open-variant" height={18} />} iconPosition="start" />
-            <Tab value="moves" label="Moves" icon={<Icon icon="mdi:chess-knight" height={18} />} iconPosition="start" />
-            <Tab value="calendar" label="Calendar" icon={<Icon icon="mdi:calendar-clock" height={18} />} iconPosition="start" />
+            <Tab
+              value="overview"
+              label="Overview"
+              icon={<Icon icon="mdi:view-dashboard" height={18} />}
+              iconPosition="start"
+            />
+            <Tab
+              value="openings"
+              label="Openings"
+              icon={<Icon icon="mdi:book-open-variant" height={18} />}
+              iconPosition="start"
+            />
+            <Tab
+              value="moves"
+              label="Moves"
+              icon={<Icon icon="mdi:chess-knight" height={18} />}
+              iconPosition="start"
+            />
+            <Tab
+              value="calendar"
+              label="Calendar"
+              icon={<Icon icon="mdi:calendar-clock" height={18} />}
+              iconPosition="start"
+            />
           </Tabs>
 
           {activeTab === "overview" && <OverviewTab stats={stats} />}
           {activeTab === "openings" && <OpeningsTab stats={stats} />}
-          {activeTab === "moves" && <MovesTab stats={stats} onAnalyze={startBatchAnalysis} isAnalyzing={isAnalyzing} unanalyzedCount={unanalyzedCount} />}
+          {activeTab === "moves" && (
+            <MovesTab
+              stats={stats}
+              onAnalyze={startBatchAnalysis}
+              isAnalyzing={isAnalyzing}
+              unanalyzedCount={unanalyzedCount}
+            />
+          )}
           {activeTab === "calendar" && <CalendarTab stats={stats} />}
         </Box>
       )}

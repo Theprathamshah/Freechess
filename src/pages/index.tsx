@@ -48,12 +48,11 @@ export default function GameAnalysis() {
         alignItems="center"
         borderRadius={2}
         border={1}
-        borderColor={"secondary.main"}
         sx={{
-          backgroundColor: "secondary.main",
-          borderColor: "primary.main",
-          borderWidth: 2,
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+          backgroundColor: "background.paper",
+          borderColor: "rgba(201,162,39,0.25)",
+          borderWidth: 1,
+          boxShadow: "0 4px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,162,39,0.08)",
         }}
         padding={2}
         style={{

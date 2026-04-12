@@ -9,10 +9,10 @@ interface Props {
 
 const nivoTheme = {
   background: "transparent",
-  text: { fill: "#aaa", fontSize: 11 },
-  axis: { ticks: { text: { fill: "#777" } } },
-  grid: { line: { stroke: "#2a2a2a" } },
-  tooltip: { container: { background: "#1a1a2e", border: "1px solid #333", color: "#fff" } },
+  text: { fill: "#8a8a96", fontSize: 11 },
+  axis: { ticks: { text: { fill: "#666" } } },
+  grid: { line: { stroke: "#222226" } },
+  tooltip: { container: { background: "#1a1a1e", border: "1px solid rgba(201,162,39,0.2)", color: "#e8e8ea" } },
 };
 
 function OpeningRow({ opening }: { opening: OpeningStat }) {
@@ -118,7 +118,7 @@ export function OpeningsTab({ stats }: Props) {
       </Box>
 
       {barData.length > 0 && (
-        <Paper sx={{ p: 3, borderRadius: 3, mb: 3, background: "rgba(255,255,255,0.03)" }}>
+        <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
           <Typography variant="body2" color="text.secondary" mb={2}>
             Games by Opening (Top 6)
           </Typography>
@@ -153,7 +153,7 @@ export function OpeningsTab({ stats }: Props) {
         </Paper>
       )}
 
-      <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)" }}>
+      <Paper sx={{ p: 3, borderRadius: 3 }}>
         <Typography variant="body2" color="text.secondary" mb={1}>
           Detailed Opening Statistics as {view === "white" ? "White ♟♙" : "Black ♟"}
         </Typography>

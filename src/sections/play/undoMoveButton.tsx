@@ -3,6 +3,7 @@ import { gameAtom, playerColorAtom } from "./states";
 import { useAtomValue } from "jotai";
 import { useChessActions } from "@/hooks/useChessActions";
 import { Color } from "@/types/enums";
+import { Icon } from "@iconify/react";
 
 export default function UndoMoveButton() {
   const game = useAtomValue(gameAtom);
@@ -25,8 +26,19 @@ export default function UndoMoveButton() {
   };
 
   return (
-    <Button variant="outlined" onClick={handleClick}>
-      Undo your last move
+    <Button
+      variant="outlined"
+      fullWidth
+      onClick={handleClick}
+      startIcon={<Icon icon="mdi:undo" height={16} />}
+      sx={{
+        borderRadius: 2,
+        py: 1.1,
+        fontWeight: 600,
+        fontSize: "0.85rem",
+      }}
+    >
+      Undo Move
     </Button>
   );
 }

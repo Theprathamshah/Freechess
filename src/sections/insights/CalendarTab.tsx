@@ -9,10 +9,10 @@ interface Props {
 
 const nivoTheme = {
   background: "transparent",
-  text: { fill: "#aaa", fontSize: 11 },
-  axis: { ticks: { text: { fill: "#777" } } },
-  grid: { line: { stroke: "#2a2a2a" } },
-  tooltip: { container: { background: "#1a1a2e", border: "1px solid #333", color: "#fff" } },
+  text: { fill: "#8a8a96", fontSize: 11 },
+  axis: { ticks: { text: { fill: "#666" } } },
+  grid: { line: { stroke: "#222226" } },
+  tooltip: { container: { background: "#1a1a1e", border: "1px solid rgba(201,162,39,0.2)", color: "#e8e8ea" } },
 };
 
 function toBarColor(winRate: number): string {
@@ -93,7 +93,7 @@ export function CalendarTab({ stats }: Props) {
             </Paper>
           )}
           {bestDay && (
-            <Paper sx={{ p: 2, borderRadius: 3, background: "rgba(25,118,210,0.08)", flex: 1, minWidth: 200 }}>
+            <Paper sx={{ p: 2, borderRadius: 3, background: "rgba(201,162,39,0.08)", flex: 1, minWidth: 200 }}>
               <Typography variant="caption" color="text.secondary">Best Day of Week</Typography>
               <Typography variant="h5" fontWeight={700} color="primary.main">{bestDay.day}</Typography>
               <Typography variant="body2" color="text.secondary">
@@ -106,7 +106,7 @@ export function CalendarTab({ stats }: Props) {
 
       {/* Hour of Day */}
       {hourData.length > 0 && (
-        <Paper sx={{ p: 3, borderRadius: 3, mb: 3, background: "rgba(255,255,255,0.03)" }}>
+        <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
           <Typography variant="h6" fontWeight={700} mb={0.5}>Win Rate by Hour of Day</Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
             When do you perform best?
@@ -127,8 +127,8 @@ export function CalendarTab({ stats }: Props) {
               tooltip={({ indexValue, value }) => {
                 const h = hourData.find(d => d.hour === indexValue);
                 return (
-                  <Box sx={{ bgcolor: "#1a1a2e", p: 1.5, borderRadius: 1, border: "1px solid #333" }}>
-                    <Typography variant="caption" color="white">
+                  <Box sx={{ bgcolor: "#1a1a1e", p: 1.5, borderRadius: 1, border: "1px solid rgba(201,162,39,0.2)" }}>
+                    <Typography variant="caption" color="#e8e8ea">
                       {indexValue}: {value}% wins · {h?.games} games · {h?.Accuracy?.toFixed(0)}% accuracy
                     </Typography>
                   </Box>
@@ -143,7 +143,7 @@ export function CalendarTab({ stats }: Props) {
       {hasDayData && (
         <Grid container spacing={2.5}>
           <Grid size={{ xs: 12, md: 7 }}>
-            <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)" }}>
+            <Paper sx={{ p: 3, borderRadius: 3 }}>
               <Typography variant="h6" fontWeight={700} mb={0.5}>Win Rate by Day of Week</Typography>
               <Typography variant="body2" color="text.secondary" mb={2}>
                 Your weekly performance pattern
@@ -165,7 +165,7 @@ export function CalendarTab({ stats }: Props) {
             </Paper>
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
-            <Paper sx={{ p: 3, borderRadius: 3, background: "rgba(255,255,255,0.03)", height: "100%" }}>
+            <Paper sx={{ p: 3, borderRadius: 3, height: "100%" }}>
               <Typography variant="h6" fontWeight={700} mb={2}>Day Breakdown</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {stats.dayOfWeekStats.map(d => (
