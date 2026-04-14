@@ -113,7 +113,7 @@ export function CoachTab({ stats }: Props) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel(
-        { model: selectedModel },
+        { model: selectedModel as string },
         { apiVersion: "v1" }
       );
 
@@ -201,7 +201,7 @@ OUTPUT FORMAT:
               <Select
                 value={selectedModel}
                 label="AI Model"
-                onChange={(e) => setSelectedModel(e.target.value)}
+                onChange={(e) => setSelectedModel(e?.target?.value as string)}
                 sx={{ borderRadius: 2 }}
               >
                 {availableModels.map(name => (
