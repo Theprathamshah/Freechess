@@ -11,7 +11,7 @@ import {
 import { Icon } from "@iconify/react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GameItem } from "./gameItem";
 
 interface Props {
@@ -37,14 +37,14 @@ export default function ChessComInput({ onSelect }: Props) {
     return [];
   }, [rawStoredValue]);
 
-  if (
-    !hasEdited &&
-    storedValues.length &&
-    chessComUsername.trim().toLowerCase() !=
-      storedValues[0].trim().toLowerCase()
-  ) {
-    setChessComUsername(storedValues[0].trim());
-  }
+  useEffect(() => {
+    if (!hasEdited && storedValues.length > 0) {
+      const initialValue = storedValues[0].trim();
+      if (chessComUsername !== initialValue) {
+        setChessComUsername(initialValue);
+      }
+    }
+  }, [hasEdited, storedValues, chessComUsername]);
 
   const updateHistory = (username: string) => {
     const trimmed = username.trim();
@@ -65,12 +65,11 @@ export default function ChessComInput({ onSelect }: Props) {
   };
 
   const handleChange = (_: React.SyntheticEvent, newValue: string | null) => {
-    const newInputValue = newValue ?? "";
-    setChessComUsername(newInputValue.trim());
+    setChessComUsername(newValue ?? "");
     setHasEdited(true);
   };
 
-  const debouncedUsername = useDebounce(chessComUsername, 300);
+  const debouncedUsername = useDebounce(chessComUsername, 500);
 
   const {
     data: games,

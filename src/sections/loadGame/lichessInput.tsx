@@ -11,7 +11,7 @@ import {
 import { Icon } from "@iconify/react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GameItem } from "./gameItem";
 
 interface Props {
@@ -37,13 +37,14 @@ export default function LichessInput({ onSelect }: Props) {
     return [];
   }, [rawStoredValue]);
 
-  if (
-    !hasEdited &&
-    storedValues.length &&
-    lichessUsername.trim().toLowerCase() != storedValues[0].trim().toLowerCase()
-  ) {
-    setLichessUsername(storedValues[0].trim());
-  }
+  useEffect(() => {
+    if (!hasEdited && storedValues.length > 0) {
+      const initialValue = storedValues[0].trim();
+      if (lichessUsername !== initialValue) {
+        setLichessUsername(initialValue);
+      }
+    }
+  }, [hasEdited, storedValues, lichessUsername]);
 
   const updateHistory = (username: string) => {
     const trimmed = username.trim();
@@ -64,8 +65,7 @@ export default function LichessInput({ onSelect }: Props) {
   };
 
   const handleChange = (_: React.SyntheticEvent, newValue: string | null) => {
-    const newInputValue = newValue ?? "";
-    setLichessUsername(newInputValue.trim());
+    setLichessUsername(newValue ?? "");
     setHasEdited(true);
   };
 
