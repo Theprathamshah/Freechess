@@ -68,8 +68,6 @@ export function CoachTab({ stats }: Props) {
     fetchModels();
   }, [apiKey]);
 
-  // ─── Data Formatting ───────────────────────────────────────────────────────
-
   const promptContent = useMemo(() => {
     const overall_accuracy = `${stats.avgAccuracy.toFixed(1)}%`;
     const win_rate = `${((stats.asWhite.wins + stats.asBlack.wins) / stats.totalGames * 100).toFixed(1)}%`;
