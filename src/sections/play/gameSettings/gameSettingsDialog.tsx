@@ -124,8 +124,28 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle marginY={1} variant="h5">
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth
+      PaperProps={{
+        sx: {
+          bgcolor: "background.paper",
+          backgroundImage: "none",
+          border: "1px solid rgba(201,162,39,0.2)",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          my: 1,
+          fontSize: "1.2rem",
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          pb: 2,
+        }}
+      >
         Set game parameters
       </DialogTitle>
       <DialogContent sx={{ paddingBottom: 0 }}>
@@ -212,7 +232,7 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
 
           {parsingError && (
             <FormControl fullWidth>
-              <Typography color="salmon" textAlign="center" marginTop={1}>
+              <Typography color="error" textAlign="center" marginTop={1}>
                 {parsingError}
               </Typography>
             </FormControl>
@@ -240,15 +260,23 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions sx={{ m: 2 }}>
+      <DialogActions sx={{ m: 2, gap: 1 }}>
         <Button
           variant="outlined"
-          sx={{ marginRight: 2 }}
           onClick={handleClose}
+          sx={{ borderRadius: 2, px: 3 }}
         >
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleGameStart}>
+        <Button
+          variant="contained"
+          onClick={handleGameStart}
+          sx={{
+            borderRadius: 2, px: 3,
+            boxShadow: "0 0 16px rgba(201,162,39,0.25)",
+            "&:hover": { boxShadow: "0 0 24px rgba(201,162,39,0.4)" },
+          }}
+        >
           Start game
         </Button>
       </DialogActions>

@@ -19,6 +19,11 @@ const MenuOptions = [
     icon: "streamline:database",
     href: "/database",
   },
+  {
+    text: "Insights",
+    icon: "streamline:graph-bar-increase-solid",
+    href: "/insights",
+  },
 ];
 
 interface Props {
