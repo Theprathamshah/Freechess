@@ -23,8 +23,9 @@ import { OverviewTab } from "./OverviewTab";
 import { OpeningsTab } from "./OpeningsTab";
 import { MovesTab } from "./MovesTab";
 import { CalendarTab } from "./CalendarTab";
+import { CoachTab } from "./CoachTab";
 
-type InsightsTab = "overview" | "openings" | "moves" | "calendar";
+type InsightsTab = "overview" | "openings" | "moves" | "calendar" | "coach";
 
 // Shared amber palette token
 const GOLD = "#c9a227";
@@ -338,6 +339,16 @@ export function InsightsDashboard() {
               icon={<Icon icon="mdi:calendar-clock" height={18} />}
               iconPosition="start"
             />
+            <Tab
+              value="coach"
+              label="AI Coach"
+              icon={<Icon icon="mdi:brain" height={18} />}
+              iconPosition="start"
+              sx={{
+                bgcolor: activeTab === "coach" ? "rgba(201,162,39,0.08)" : "transparent",
+                borderRadius: "8px 8px 0 0",
+              }}
+            />
           </Tabs>
 
           {activeTab === "overview" && <OverviewTab stats={stats} />}
@@ -351,6 +362,7 @@ export function InsightsDashboard() {
             />
           )}
           {activeTab === "calendar" && <CalendarTab stats={stats} />}
+          {activeTab === "coach" && <CoachTab stats={stats} />}
         </Box>
       )}
     </Box>
