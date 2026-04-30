@@ -39,12 +39,16 @@ interface Props {
 
 export function CoachTab({ stats }: Props) {
   const [apiKey, setApiKey] = useLocalStorage<string>(GEMINI_KEY_STORAGE, "");
-  const [selectedModel, setSelectedModel] = useLocalStorage<string>(GEMINI_MODEL_STORAGE, "gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useLocalStorage<string>(
+    GEMINI_MODEL_STORAGE,
+    "gemini-1.5-flash"
+  );
   const [showKeyInput, setShowKeyInput] = useState(!apiKey);
   const [analysis, setAnalysis] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [availableModels, setAvailableModels] = useState<string[]>(DEFAULT_MODELS);
+  const [availableModels, setAvailableModels] =
+    useState<string[]>(DEFAULT_MODELS);
 
   // ─── Model Discovery ───────────────────────────────────────────────────────
 
@@ -53,11 +57,15 @@ export function CoachTab({ stats }: Props) {
 
     const fetchModels = async () => {
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`
+        );
         const data = await res.json();
         if (data.models) {
           const names = data.models
-            .filter((m: any) => m.supportedGenerationMethods.includes("generateContent"))
+            .filter((m: any) =>
+              m.supportedGenerationMethods.includes("generateContent")
+            )
             .map((m: any) => m.name.replace("models/", ""));
           setAvailableModels(names.length > 0 ? names : DEFAULT_MODELS);
         }
@@ -70,22 +78,32 @@ export function CoachTab({ stats }: Props) {
 
   const promptContent = useMemo(() => {
     const overall_accuracy = `${stats.avgAccuracy.toFixed(1)}%`;
-    const win_rate = `${((stats.asWhite.wins + stats.asBlack.wins) / stats.totalGames * 100).toFixed(1)}%`;
+    const win_rate = `${(((stats.asWhite.wins + stats.asBlack.wins) / stats.totalGames) * 100).toFixed(1)}%`;
     const white_accuracy = `${stats.asWhite.avgAccuracy.toFixed(1)}%`;
     const black_accuracy = `${stats.asBlack.avgAccuracy.toFixed(1)}%`;
     const white_stats = `W: ${stats.asWhite.wins} / D: ${stats.asWhite.draws} / L: ${stats.asWhite.losses} (${stats.asWhite.winRate.toFixed(1)}% win rate)`;
     const black_stats = `W: ${stats.asBlack.wins} / D: ${stats.asBlack.draws} / L: ${stats.asBlack.losses} (${stats.asBlack.winRate.toFixed(1)}% win rate)`;
 
-    const opening_accuracy = `${stats.phaseAccuracy.find(p => p.phase === "Opening")?.accuracy.toFixed(1)}%`;
-    const middlegame_accuracy = `${stats.phaseAccuracy.find(p => p.phase === "Middlegame")?.accuracy.toFixed(1)}%`;
-    const endgame_accuracy = `${stats.phaseAccuracy.find(p => p.phase === "Endgame")?.accuracy.toFixed(1)}%`;
+    const opening_accuracy = `${stats.phaseAccuracy.find((p) => p.phase === "Opening")?.accuracy.toFixed(1)}%`;
+    const middlegame_accuracy = `${stats.phaseAccuracy.find((p) => p.phase === "Middlegame")?.accuracy.toFixed(1)}%`;
+    const endgame_accuracy = `${stats.phaseAccuracy.find((p) => p.phase === "Endgame")?.accuracy.toFixed(1)}%`;
 
-    const blunders = stats.moveQuality.find(m => m.classification === "blunder")?.count ?? 0;
-    const mistakes = stats.moveQuality.find(m => m.classification === "mistake")?.count ?? 0;
-    const inaccuracies = stats.moveQuality.find(m => m.classification === "inaccuracy")?.count ?? 0;
+    const blunders =
+      stats.moveQuality.find((m) => m.classification === "blunder")?.count ?? 0;
+    const mistakes =
+      stats.moveQuality.find((m) => m.classification === "mistake")?.count ?? 0;
+    const inaccuracies =
+      stats.moveQuality.find((m) => m.classification === "inaccuracy")?.count ??
+      0;
 
-    const topOpeningsWhite = stats.openingsAsWhite.slice(0, 3).map(o => `${o.name} (${o.winRate.toFixed(0)}% win rate)`).join(", ");
-    const topOpeningsBlack = stats.openingsAsBlack.slice(0, 3).map(o => `${o.name} (${o.winRate.toFixed(0)}% win rate)`).join(", ");
+    const topOpeningsWhite = stats.openingsAsWhite
+      .slice(0, 3)
+      .map((o) => `${o.name} (${o.winRate.toFixed(0)}% win rate)`)
+      .join(", ");
+    const topOpeningsBlack = stats.openingsAsBlack
+      .slice(0, 3)
+      .map((o) => `${o.name} (${o.winRate.toFixed(0)}% win rate)`)
+      .join(", ");
     const opening_stats = `As White: ${topOpeningsWhite || "N/A"}. As Black: ${topOpeningsBlack || "N/A"}`;
 
     return `* Overall accuracy: ${overall_accuracy}
@@ -142,7 +160,9 @@ OUTPUT FORMAT:
       setError(msg);
 
       if (msg.includes("404") || msg.includes("not found")) {
-        setError(`${msg}. Try selecting a different model from the settings dropdown. Ensure 'Generative Language API' is enabled in your Google Cloud Console.`);
+        setError(
+          `${msg}. Try selecting a different model from the settings dropdown. Ensure 'Generative Language API' is enabled in your Google Cloud Console.`
+        );
       }
 
       if (err instanceof Error && err.message.includes("API_KEY_INVALID")) {
@@ -160,11 +180,28 @@ OUTPUT FORMAT:
   return (
     <Box>
       {/* ─── API Settings ─── */}
-      <Paper sx={{ p: 3, borderRadius: 3, mb: 3, background: "rgba(201,162,39,0.04)", border: "1px dashed rgba(201,162,39,0.2)" }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+      <Paper
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          mb: 3,
+          background: "rgba(201,162,39,0.04)",
+          border: "1px dashed rgba(201,162,39,0.2)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 2,
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Icon icon="logos:google-gemini" height={20} />
-            <Typography variant="body2" fontWeight={700}>AI Coaching Configuration</Typography>
+            <Typography variant="body2" fontWeight={700}>
+              AI Coaching Configuration
+            </Typography>
           </Box>
           <Button
             size="small"
@@ -190,7 +227,11 @@ OUTPUT FORMAT:
                 sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
               />
               <Tooltip title="Get a free key from Google AI Studio">
-                <IconButton href="https://aistudio.google.com/app/apikey" target="_blank" size="small">
+                <IconButton
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  size="small"
+                >
                   <Icon icon="mdi:information-outline" />
                 </IconButton>
               </Tooltip>
@@ -204,12 +245,15 @@ OUTPUT FORMAT:
                 onChange={(e) => setSelectedModel(e?.target?.value as string)}
                 sx={{ borderRadius: 2 }}
               >
-                {availableModels.map(name => (
-                  <MenuItem key={name} value={name}>{name}</MenuItem>
+                {availableModels.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
                 ))}
               </Select>
               <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.6 }}>
-                Pick a model from the list. If your preferred model is missing, check your API Key permissions.
+                Pick a model from the list. If your preferred model is missing,
+                check your API Key permissions.
               </Typography>
             </FormControl>
           </Box>
@@ -223,26 +267,38 @@ OUTPUT FORMAT:
           size="large"
           onClick={handleGenerate}
           disabled={isGenerating || stats.analyzedGames === 0}
-          startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <Icon icon="mdi:auto-fix" />}
+          startIcon={
+            isGenerating ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <Icon icon="mdi:auto-fix" />
+            )
+          }
           sx={{
             px: 6,
             py: 1.5,
             borderRadius: 8,
             boxShadow: `0 8px 16px rgba(201,162,39,0.25)`,
-            "&:hover": { boxShadow: `0 12px 24px rgba(201,162,39,0.4)` }
+            "&:hover": { boxShadow: `0 12px 24px rgba(201,162,39,0.4)` },
           }}
         >
           {isGenerating ? "Analyzing..." : "Generate Coaching Report"}
         </Button>
         {stats.analyzedGames === 0 && (
-          <Typography variant="caption" color="error" sx={{ display: "block", mt: 1 }}>
+          <Typography
+            variant="caption"
+            color="error"
+            sx={{ display: "block", mt: 1 }}
+          >
             Analyze some games first to see insights!
           </Typography>
         )}
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+          {error}
+        </Alert>
       )}
 
       {/* ─── Output ─── */}
@@ -254,34 +310,58 @@ OUTPUT FORMAT:
             position: "relative",
             background: "rgba(255,255,255,0.02)",
             border: "1px solid rgba(255,255,255,0.05)",
-            boxShadow: "0 24px 48px rgba(0,0,0,0.5)"
+            boxShadow: "0 24px 48px rgba(0,0,0,0.5)",
           }}
         >
           <Box sx={{ position: "absolute", top: 16, right: 16 }}>
             <Tooltip title="Copy to clipboard">
-              <IconButton onClick={handleCopy} size="small" sx={{ opacity: 0.6, "&:hover": { opacity: 1 } }}>
+              <IconButton
+                onClick={handleCopy}
+                size="small"
+                sx={{ opacity: 0.6, "&:hover": { opacity: 1 } }}
+              >
                 <Icon icon="mdi:content-copy" />
               </IconButton>
             </Tooltip>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
-            <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: "rgba(201,162,39,0.1)", color: GOLD }}>
+            <Box
+              sx={{
+                p: 1,
+                borderRadius: 1.5,
+                bgcolor: "rgba(201,162,39,0.1)",
+                color: GOLD,
+              }}
+            >
               <Icon icon="mdi:shield-outline" height={24} />
             </Box>
             <Box>
-              <Typography variant="h6" fontWeight={800} letterSpacing="-0.5px">Coach's Analysis</Typography>
-              <Typography variant="caption" color="text.secondary">Generated by {selectedModel} · {stats.analyzedGames} games</Typography>
+              <Typography variant="h6" fontWeight={800} letterSpacing="-0.5px">
+                Coach's Analysis
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Generated by {selectedModel} · {stats.analyzedGames} games
+              </Typography>
             </Box>
           </Box>
 
           <Divider sx={{ mb: 3, opacity: 0.1 }} />
 
-          <Box sx={{
-            "& li": { mb: 2, listStyle: "none" },
-            "& p": { m: 0, color: "text.secondary" },
-            "& strong": { color: GOLD, fontSize: "1.1rem", borderBottom: `2px solid rgba(201,162,39,0.2)`, pb: 0.5, mb: 1.5, display: "inline-block" }
-          }}>
+          <Box
+            sx={{
+              "& li": { mb: 2, listStyle: "none" },
+              "& p": { m: 0, color: "text.secondary" },
+              "& strong": {
+                color: GOLD,
+                fontSize: "1.1rem",
+                borderBottom: `2px solid rgba(201,162,39,0.2)`,
+                pb: 0.5,
+                mb: 1.5,
+                display: "inline-block",
+              },
+            }}
+          >
             <ReactMarkdown>{analysis}</ReactMarkdown>
           </Box>
         </Paper>
@@ -290,10 +370,21 @@ OUTPUT FORMAT:
       {/* ─── Debug Information ─── */}
       {!analysis && !isGenerating && (
         <Box sx={{ opacity: 0.3, mt: 4 }}>
-          <Typography variant="caption" sx={{ textTransform: "uppercase", letterSpacing: "0.1em", mb: 1, display: "block" }}>
+          <Typography
+            variant="caption"
+            sx={{
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              mb: 1,
+              display: "block",
+            }}
+          >
             Data points mapped for analysis:
           </Typography>
-          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: "transparent" }}>
+          <Paper
+            variant="outlined"
+            sx={{ p: 2, borderRadius: 2, bgcolor: "transparent" }}
+          >
             <pre style={{ fontSize: "0.75rem", margin: 0, overflowX: "auto" }}>
               {promptContent}
             </pre>

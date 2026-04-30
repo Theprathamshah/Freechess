@@ -1,18 +1,25 @@
 import { useGameDatabase } from "./useGameDatabase";
-import { useEngine } from "./useEngine";
-import { EngineName, MoveClassification } from "@/types/enums";
-import { Game, LoadedGame } from "@/types/game";
+import { MoveClassification } from "@/types/enums";
+import { CloudGame, Game, LoadedGame } from "@/types/game";
 import { GameEval } from "@/types/eval";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Chess } from "chess.js";
 import { getLichessUserRecentGames } from "@/lib/lichess";
 import { getChessComUserRecentGames } from "@/lib/chessCom";
+import {
+  fetchCloudGames,
+  getCloudAnalysisJob,
+  ingestGamesToCloud,
+  queueCloudAnalysis,
+} from "@/lib/cloudInsightsApi";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type AnalysisTarget = "local" | "external" | "combined";
 
 export type ExtendedGame = (Game | (LoadedGame & { eval?: GameEval }));
+
+export type CloudAnalysisJobStatus = "idle" | "queued" | "processing";
 
 export interface ColorStats {
   games: number;
@@ -226,15 +233,25 @@ function detectTermination(game: ExtendedGame): string {
 // ─── Main Hook ───────────────────────────────────────────────────────────────
 
 export const useChessInsights = (username: string) => {
-  const { games, setGameEval, isReady: isDbReady } = useGameDatabase(true);
-  const engine = useEngine(EngineName.Stockfish17Lite);
-
-  const [externalGames, setExternalGames] = useState<(LoadedGame & { eval?: GameEval })[]>([]);
+  const { games, isReady: isDbReady } = useGameDatabase(true);
+  const [cloudGames, setCloudGames] = useState<CloudGame[]>([]);
   const [analysisTarget, setAnalysisTarget] = useState<AnalysisTarget>("combined");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [cloudJobStatus, setCloudJobStatus] = useState<CloudAnalysisJobStatus>("idle");
+
+  const refreshCloudGames = useCallback(async () => {
+    const fetchedCloudGames = await fetchCloudGames("all", true);
+    setCloudGames(fetchedCloudGames);
+  }, []);
+
+  useEffect(() => {
+    refreshCloudGames().catch((error) => {
+      console.error("Failed to load cloud games", error);
+    });
+  }, [refreshCloudGames]);
 
   // ── Fetch external games ──────────────────────────────────────────────────
 
@@ -250,26 +267,45 @@ export const useChessInsights = (username: string) => {
           ? await getLichessUserRecentGames(externalUsername)
           : await getChessComUserRecentGames(externalUsername);
 
-      setExternalGames(prev => {
-        const domain = platform === "lichess" ? "lichess.org" : "chess.com";
-        const others = prev.filter(g => !g.url?.includes(domain));
-        return [...others, ...fetched];
-      });
+      await ingestGamesToCloud(platform, fetched);
+      await refreshCloudGames();
       setAnalysisTarget("external");
     } catch (err) {
       setFetchError(err instanceof Error ? err.message : "Failed to fetch games");
     } finally {
       setIsFetching(false);
     }
-  }, []);
+  }, [refreshCloudGames]);
 
   // ── Combine relevant games ────────────────────────────────────────────────
 
+  const cloudExtendedGames = useMemo(
+    () =>
+      cloudGames.map((game) => ({
+        id: game.id,
+        pgn: game.pgn,
+        date: game.playedAt ?? undefined,
+        white: {
+          name: game.whiteName,
+          rating: game.whiteRating ?? undefined,
+        },
+        black: {
+          name: game.blackName,
+          rating: game.blackRating ?? undefined,
+        },
+        result: game.result ?? undefined,
+        timeControl: game.timeControl ?? undefined,
+        url: game.url ?? undefined,
+        eval: game.eval,
+      })),
+    [cloudGames]
+  );
+
   const allRelevantGames = useMemo((): ExtendedGame[] => {
     if (analysisTarget === "local") return games;
-    if (analysisTarget === "external") return externalGames;
-    return [...games, ...externalGames];
-  }, [games, externalGames, analysisTarget]);
+    if (analysisTarget === "external") return cloudExtendedGames;
+    return [...games, ...cloudExtendedGames];
+  }, [games, cloudExtendedGames, analysisTarget]);
 
   const analyzedGames = useMemo(() =>
     allRelevantGames.filter(g => !!g.eval), [allRelevantGames]);
@@ -550,55 +586,50 @@ export const useChessInsights = (username: string) => {
       hourStats,
       dayOfWeekStats,
     };
-  }, [analyzedGames, allRelevantGames, games, externalGames, username]);
+  }, [analyzedGames, allRelevantGames, username]);
 
   // ── Batch analysis ────────────────────────────────────────────────────────
 
   const startBatchAnalysis = useCallback(async () => {
-    if (!engine || unanalyzedGames.length === 0 || isAnalyzing) return;
+    if (unanalyzedGames.length === 0 || isAnalyzing) return;
+    const cloudUnanalyzedIds = cloudGames
+      .filter((game) => !game.eval)
+      .map((game) => game.id);
+    if (cloudUnanalyzedIds.length === 0) return;
+
     setIsAnalyzing(true);
-    let completed = 0;
-
-    for (const game of unanalyzedGames) {
-      try {
-        const board = new Chess();
-        board.loadPgn(game.pgn);
-        const history = board.history({ verbose: true });
-
-        const tempBoard = new Chess();
-        const allFens = [tempBoard.fen()];
-        const uciMoves: string[] = [];
-
-        for (const move of history) {
-          tempBoard.move(move);
-          allFens.push(tempBoard.fen());
-          uciMoves.push(move.lan);
-        }
-
-        const evaluation = await engine.evaluateGame({
-          fens: allFens,
-          uciMoves,
-          depth: 10,
-        });
-
-        const isLocal = typeof game.id === "number";
-        if (isLocal) {
-          await setGameEval(game.id as number, evaluation);
-        } else {
-          setExternalGames(prev =>
-            prev.map(eg => (eg.id === game.id ? { ...eg, eval: evaluation } : eg))
-          );
-        }
-      } catch (err) {
-        console.error(`Failed to analyze game ${game.id}:`, err);
-      }
-      completed++;
-      setProgress((completed / unanalyzedGames.length) * 100);
-    }
-
-    setIsAnalyzing(false);
+    setCloudJobStatus("queued");
     setProgress(0);
-  }, [engine, unanalyzedGames, isAnalyzing, setGameEval]);
+
+    try {
+      const jobIds = await queueCloudAnalysis(cloudUnanalyzedIds, 12, 1);
+      const pending = new Set(jobIds);
+      let completedJobs = 0;
+
+      while (pending.size > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1250));
+        setCloudJobStatus("processing");
+
+        for (const jobId of Array.from(pending)) {
+          const job = await getCloudAnalysisJob(jobId);
+          if (job.status === "completed" || job.status === "failed") {
+            pending.delete(jobId);
+            completedJobs += 1;
+            setProgress((completedJobs / jobIds.length) * 100);
+          }
+        }
+      }
+
+      await refreshCloudGames();
+    } catch (err) {
+      console.error("Cloud analysis failed", err);
+      setFetchError(err instanceof Error ? err.message : "Cloud analysis failed");
+    } finally {
+      setCloudJobStatus("idle");
+      setIsAnalyzing(false);
+      setProgress(0);
+    }
+  }, [cloudGames, unanalyzedGames.length, isAnalyzing, refreshCloudGames]);
 
   return {
     stats,
@@ -613,6 +644,7 @@ export const useChessInsights = (username: string) => {
     unanalyzedCount: unanalyzedGames.length,
     analyzedCount: analyzedGames.length,
     totalCount: allRelevantGames.length,
-    isReady: isDbReady && !!engine,
+    cloudJobStatus,
+    isReady: isDbReady,
   };
 };

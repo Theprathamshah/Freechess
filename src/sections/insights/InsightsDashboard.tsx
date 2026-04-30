@@ -47,6 +47,7 @@ export function InsightsDashboard() {
     unanalyzedCount,
     analyzedCount,
     totalCount,
+    cloudJobStatus,
     isReady,
   } = useChessInsights(username);
 
@@ -95,7 +96,7 @@ export function InsightsDashboard() {
                 Chess Insights
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Your unified chess identity · Powered by Stockfish 17
+                Your unified chess identity · Powered by cloud Stockfish analysis
               </Typography>
             </Box>
 
@@ -129,7 +130,9 @@ export function InsightsDashboard() {
                   }
                   sx={{ borderRadius: 6, px: 2 }}
                 >
-                  {isAnalyzing ? `Analyzing… ${Math.round(progress)}%` : `Analyze ${unanalyzedCount}`}
+                  {isAnalyzing
+                    ? `${cloudJobStatus === "queued" ? "Queueing…" : "Analyzing…"} ${Math.round(progress)}%`
+                    : `Analyze ${unanalyzedCount}`}
                 </Button>
               )}
             </Stack>
@@ -290,7 +293,7 @@ export function InsightsDashboard() {
           <Typography color="text.secondary" maxWidth={440} mx="auto">
             Fetch games from Lichess or Chess.com above, then click{" "}
             <strong style={{ color: GOLD }}>Analyze</strong> to run Stockfish.
-            Results appear here as games are processed.
+            Results appear here as cloud jobs complete.
           </Typography>
         </Box>
       )}

@@ -63,28 +63,19 @@ export const getChessComUserRecentGames = async (
   const date = new Date();
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth() + 1;
-  const paddedMonth = getPaddedNumber(month);
-
-  const url = `https://api.chess.com/pub/player/${username}/games/${year}/${paddedMonth}`;
-  const data = await cachedFetch(url);
-
-  if (
-    !data?.games &&
-    data?.message !== "Date cannot be set in the future"
-  ) {
-    throw new Error("Error fetching games from Chess.com");
-  }
-
-  const games: ChessComGame[] = data?.games ?? [];
+  const games = await getChessComUserGamesForMonth(username, year, month);
 
   if (games.length < 50) {
     const previousMonth = month === 1 ? 12 : month - 1;
     const previousPaddedMonth = getPaddedNumber(previousMonth);
     const yearToFetch = previousMonth === 12 ? year - 1 : year;
 
-    const prevUrl = `https://api.chess.com/pub/player/${username}/games/${yearToFetch}/${previousPaddedMonth}`;
-    const dataPreviousMonth = await cachedFetch(prevUrl);
-    games.push(...(dataPreviousMonth?.games ?? []));
+    const previousMonthGames = await getChessComUserGamesForMonth(
+      username,
+      yearToFetch,
+      Number(previousPaddedMonth)
+    );
+    games.push(...previousMonthGames);
   }
 
   const gamesToReturn = games
@@ -94,6 +85,20 @@ export const getChessComUserRecentGames = async (
     .map(formatChessComGame);
 
   return gamesToReturn;
+};
+
+export const getChessComUserGamesForMonth = async (
+  username: string,
+  year: number,
+  month: number
+): Promise<ChessComGame[]> => {
+  const paddedMonth = getPaddedNumber(month);
+  const url = `https://api.chess.com/pub/player/${username}/games/${year}/${paddedMonth}`;
+  const data = await cachedFetch(url);
+  if (!data?.games && data?.message !== "Date cannot be set in the future") {
+    throw new Error("Error fetching games from Chess.com");
+  }
+  return data?.games ?? [];
 };
 
 export const getChessComUserAvatar = async (
