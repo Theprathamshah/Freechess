@@ -11,6 +11,7 @@ import NavLink from "@/components/NavLink";
 import Image from "next/image";
 import { styled } from "@mui/material/styles";
 import { Button, Stack } from "@mui/material";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 interface Props {
   darkMode: boolean;
@@ -138,6 +139,38 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
 
           {/* Right-side icons */}
           <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <Button
+                  size="small"
+                  sx={{ textTransform: "none", minWidth: "auto", px: 1.2 }}
+                  color="inherit"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button
+                  size="small"
+                  variant="contained"
+                  sx={{ textTransform: "none", minWidth: "auto", px: 1.2 }}
+                >
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: {
+                      width: "28px",
+                      height: "28px",
+                    },
+                  },
+                }}
+              />
+            </Show>
             <StyledIconButtonLink
               href="https://discord.gg/Yr99abAcUr"
               target="_blank"
