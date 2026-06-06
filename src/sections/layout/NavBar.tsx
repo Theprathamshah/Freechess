@@ -33,6 +33,7 @@ const NAV_LINKS = [
   { label: "Analysis", href: "/", icon: "streamline:magnifying-glass-solid" },
   { label: "Insights", href: "/insights", icon: "streamline:graph-bar-increase-solid" },
   { label: "Play", href: "/play", icon: "streamline:chess-pawn" },
+  { label: "Puzzles", href: "/puzzles", icon: "mdi:puzzle" },
   { label: "Database", href: "/database", icon: "streamline:database" },
 ];
 
